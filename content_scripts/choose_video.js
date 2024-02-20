@@ -14,6 +14,8 @@
       });
 
     var offset = 0;
+    var yPosition = 70;
+    var fontSize = 20;
 
 
     function startExtension(){
@@ -37,52 +39,32 @@
             /**
              * only create the overlay once
              */
-            if(document.getElementById("overlay")){
-                document.getElementById("overlay").classList.remove("hidden");
-                document.getElementById("overlay").appendChild(chooseVideoPopup());
+            if(document.getElementById("customSubsOverlay")){
+                document.getElementById("customSubsOverlay").classList.remove("hidden");
                 return;
             }
+
+            console.log("create overlay");
 
             createStyleSheet();
 
             const overlay = document.createElement("div");
-            overlay.id = "overlay"
+            overlay.id = "customSubsOverlay";
 
-            // close button
-            const exitButton = document.createElement("button");
-            exitButton.innerHTML = "close";
-            exitButton.addEventListener("click", () => {
-                // create subtitles when overlay is closed
-                createSubtitles();
-                overlay.classList.add("hidden");
-            });
-
-
-            // file upload
-            const fileUpload = document.createElement("input");
-            fileUpload.type = "file";
-            fileUpload.accept = ".srt";
-
-            const reader = new FileReader();
-            reader.addEventListener('load', (event) => {
-                subtitleText = event.target.result;
-                subtitleObjects = parseSrt(subtitleText);
-
-            });
-
-            fileUpload.addEventListener("change", (event) => {
-
-                let lastIndex = fileUpload.files.length - 1;
-                srtFile = fileUpload.files[lastIndex];
- 
-                reader.readAsText(srtFile);
-            });
+            const contentContainer = document.createElement("div");
+            contentContainer.id = "contentContainer";
+          
 
             // add dom elements to overlay
-            overlay.appendChild(exitButton);
-            overlay.appendChild(chooseVideoPopup());
-            overlay.appendChild(fileUpload);
-            overlay.appendChild(chooseOffset());
+            overlay.appendChild(closeButton(overlay));
+
+            contentContainer.appendChild(videoSelector());
+            contentContainer.appendChild(fileSelector());
+            contentContainer.appendChild(offsetSelector());
+            contentContainer.appendChild(yPositionSelector());
+            contentContainer.appendChild(fontSizeSelector());
+
+            overlay.appendChild(contentContainer);
 
             // display overlay
             document.body.prepend(overlay);
@@ -94,15 +76,39 @@
          */
         function createStyleSheet(){
             const styles = `
-            #overlay { 
+            #customSubsOverlay { 
                 background-color: #7e7e7ea6;
                 z-index: 2147483647;
                 position: fixed;
-                width: 100%;
-                height: 100%;
+                color: black;
+                right: 20px;
+                top: 20px;
+                padding: 20px;
+                font-size: 20px;
             }
+
+            #contentContainer {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                top: 40%;
+                position: relative;
+                gap: 25px;
+                padding-top: 15px;
+            }
+
         
-            .popup-content {
+            .videoSelector {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .description {
+
+            }
+
+            .contentWrapper {
                 display: flex;
             }
     
@@ -122,7 +128,59 @@
             document.body.appendChild(styleSheet);
         }
 
-        function chooseOffset(){
+        function closeButton(overlay){
+            // close button
+            const closeButton = document.createElement("button");
+            closeButton.innerHTML = "close";
+            closeButton.addEventListener("click", () => {
+                // create subtitles when overlay is closed
+                createSubtitles();
+                overlay.classList.add("hidden");
+            });
+
+            return closeButton;
+        }
+
+        function fileSelector(){
+
+            const contentWrapper = document.createElement("div");
+            const description = document.createElement("div");
+            description.innerHTML = "Select a srt File: "
+            description.classList.add("description");
+            contentWrapper.classList.add("contentWrapper");
+
+            const fileSelector = document.createElement("input");
+            fileSelector.type = "file";
+            fileSelector.accept = ".srt";
+
+            const reader = new FileReader();
+            reader.addEventListener('load', (event) => {
+                subtitleText = event.target.result;
+                subtitleObjects = parseSrt(subtitleText);
+
+            });
+
+            fileSelector.addEventListener("change", (event) => {
+
+                let lastIndex = fileSelector.files.length - 1;
+                srtFile = fileSelector.files[lastIndex];
+ 
+                reader.readAsText(srtFile);
+            });
+
+            contentWrapper.appendChild(description).appendChild(fileSelector);
+
+            return contentWrapper;
+        }
+
+        function offsetSelector(){
+
+            const contentWrapper = document.createElement("div");
+            const description = document.createElement("div");
+            description.innerHTML = "Offset in sec: "
+            description.classList.add("description");
+            contentWrapper.classList.add("contentWrapper");
+
             const offsetInput = document.createElement("input");
             offsetInput.type = "text";
             offsetInput.value = offset;
@@ -130,16 +188,66 @@
             offsetInput.addEventListener("change", () => {
                 
                 offset = Number(offsetInput.value * 1000);
-                console.log(offset);
             });
 
-            return offsetInput;
+            contentWrapper.appendChild(description).appendChild(offsetInput);
+
+            return contentWrapper;
         }
 
-        function chooseVideoPopup(){
+        function yPositionSelector(){
+
+            const contentWrapper = document.createElement("div");
+            const description = document.createElement("div");
+            description.innerHTML = "Position of subtitles: "
+            description.classList.add("description");
+            contentWrapper.classList.add("contentWrapper");
+
+            const yPosInput = document.createElement("input");
+            yPosInput.type = "text";
+            yPosInput.value = yPosition;
+
+            yPosInput.addEventListener("change", () => {
+                
+                yPosition = Number(yPosInput.value);
+            });
+
+            contentWrapper.appendChild(description).appendChild(yPosInput);
+
+            return contentWrapper;
+        }
+
+        function fontSizeSelector(){
+
+            const contentWrapper = document.createElement("div");
+            const description = document.createElement("div");
+            description.innerHTML = "Font size of subtitles: "
+            description.classList.add("description");
+            contentWrapper.classList.add("contentWrapper");
+
+            const fontSizeInput = document.createElement("input");
+            fontSizeInput.type = "text";
+            fontSizeInput.value = fontSize;
+
+            fontSizeInput.addEventListener("change", () => {
+                
+                fontSize = Number(fontSizeInput.value);
+            });
+            contentWrapper.appendChild(description).appendChild(fontSizeInput);
+
+            return contentWrapper;
+        }
+
+        function videoSelector(){
             // choose video
-            const popupContent = document.createElement("div");
-            popupContent.classList.add("popup-content");
+            const videoSelector = document.createElement("div");
+            videoSelector.classList.add("videoSelector");
+
+            const description = document.createElement("div");
+            description.innerHTML = "Select a video: "
+            description.classList.add("description");
+
+            videoSelector.appendChild(description);
     
             for(let i = 0; i < videolist.length; i++){
                 let newButton = document.createElement("button");
@@ -152,16 +260,22 @@
                     pickedVideo = videolist[i];
                 });
                 
-                popupContent.appendChild(newButton);
+                videoSelector.appendChild(newButton);
             }
 
-            return popupContent;
+            return videoSelector;
         }
 
         function setSubtitleText(text, subtitle){
             subtitle.innerHTML = text;
         }
 
+        /**
+         * 
+         * @param {the subtitle dom object} subtitle 
+         * @param {the video dom object} video 
+         * @param {the parsed subtitles} subtitleObjects 
+         */
         function listenForSubtitleUpdate(subtitle, video, subtitleObjects){
 
             video.addEventListener("timeupdate", (event)=>{
@@ -171,6 +285,7 @@
                 for(let i = 0; i<subtitleObjects.length; i++){
                     if((video.currentTime * 1000 + offset) > subtitleObjects[i].startTime && (video.currentTime * 1000 + offset) < subtitleObjects[i].endTime){
                         setSubtitleText(subtitleObjects[i].text, subtitle);
+                        console.log(subtitleObjects[i].text);
                         subtitleSet = true;
                         break;
                     }
@@ -202,8 +317,9 @@
             if(pickedVideo!= null && subtitleObjects != null){
                 console.log("subtitles");
                 subtitleDOM = document.createElement("div");
-                subtitleDOM.innerHTML = "SUBTITLE";
+                subtitleDOM.innerHTML = "";
                 subtitleDOM.classList.add("subtitle");
+                subtitleDOM.style.fontSize = fontSize + "px";
                 
                 positionSubtitles(subtitleDOM, pickedVideo);
 
@@ -215,10 +331,8 @@
                 });
 
                 observer.observe(pickedVideo);
-
                 listenForSubtitleUpdate(subtitleDOM, pickedVideo, subtitleObjects);
             }
-
         }
 
         /**
@@ -226,7 +340,7 @@
          */
         function positionSubtitles(subtitle, video){
             let rect = video.getBoundingClientRect();
-            subtitle.style.top = ((rect.height/100)*70)+"px";
+            subtitle.style.top = ((rect.height/100)*yPosition)+"px";
         }
 
     }
@@ -265,7 +379,7 @@
                 if(j === subtitle.length-1){
                     subtitleLines = subtitleLines + subtitle[j];
                 }else{
-                    subtitleLines = subtitleLines + subtitle[j] + "\r\n";
+                    subtitleLines = subtitleLines + subtitle[j] + "<br>";
                 }
             }
 
