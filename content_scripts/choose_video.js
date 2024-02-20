@@ -16,6 +16,7 @@
     var offset = 0;
     var yPosition = 70;
     var fontSize = 20;
+    var showSubs = false;
 
 
     function startExtension(){
@@ -63,6 +64,7 @@
             contentContainer.appendChild(offsetSelector());
             contentContainer.appendChild(yPositionSelector());
             contentContainer.appendChild(fontSizeSelector());
+            contentContainer.appendChild(toggleSubtitlesButton());
 
             overlay.appendChild(contentContainer);
 
@@ -133,12 +135,32 @@
             const closeButton = document.createElement("button");
             closeButton.innerHTML = "close";
             closeButton.addEventListener("click", () => {
-                // create subtitles when overlay is closed
-                createSubtitles();
                 overlay.classList.add("hidden");
             });
 
             return closeButton;
+        }
+
+        function toggleSubtitlesButton(){
+            
+            const toggleSubtitles = document.createElement("button");
+            toggleSubtitles.innerHTML = "toggle Subtitles";
+            toggleSubtitles.addEventListener("click", () => {
+                if(showSubs === true){
+                    showSubs = false;
+                    let subtitles = document.getElementsByClassName("subtitle");
+    
+                    for(let i = 0; i < subtitles.length; i++){
+                        subtitles[i].remove();
+                    
+                    }
+                }else{
+                    showSubs = true;
+                    createSubtitles();
+                }
+            });
+
+            return toggleSubtitles;
         }
 
         function fileSelector(){
