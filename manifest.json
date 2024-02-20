@@ -1,0 +1,34 @@
+{
+    "manifest_version": 2,
+    "name": "CustomSubs",
+    "version": "1.0",
+  
+    "description": "Enables upload of custom srt files to stream videos with subtitles.",
+    "icons": {
+      "48": "icons/customSubs-48.png"
+    },
+    
+    "permissions": ["activeTab","browsingData","tabs"],
+
+    "browser_action": {
+        "default_icon": "icons/customSubs-32.png",
+        "default_title": "CustomSubs"
+      },
+
+    "background": {
+        "scripts": [
+          "background_scripts/start_extension.js"
+        ]
+      },
+      "content_scripts": [
+        {
+          "matches": [
+            "<all_urls>"
+          ],
+          "js": [
+            "content_scripts/choose_video.js"
+          ]
+        }
+    ]
+  }
+  
