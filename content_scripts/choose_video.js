@@ -106,6 +106,10 @@
                 flex-direction: column;
             }
 
+            .selected {
+                background-color: #7e7e7ea6;
+            }
+
             .description {
 
             }
@@ -146,16 +150,19 @@
             const toggleSubtitles = document.createElement("button");
             toggleSubtitles.innerHTML = "toggle Subtitles";
             toggleSubtitles.addEventListener("click", () => {
+
                 if(showSubs === true){
                     showSubs = false;
                     let subtitles = document.getElementsByClassName("subtitle");
+
+                    toggleSubtitles.classList.remove("selected");
     
                     for(let i = 0; i < subtitles.length; i++){
                         subtitles[i].remove();
-                    
                     }
                 }else{
                     showSubs = true;
+                    toggleSubtitles.classList.add("selected");
                     createSubtitles();
                 }
             });
@@ -280,6 +287,14 @@
                 }
                 newButton.addEventListener("click", () => {
                     pickedVideo = videolist[i];
+
+                    for(let j = 1; j< videoSelector.children.length; j++){
+                        videoSelector.children[j].classList.remove("selected");
+                    }
+
+                    newButton.classList.add("selected");
+
+
                 });
                 
                 videoSelector.appendChild(newButton);
